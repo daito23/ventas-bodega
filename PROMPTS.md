@@ -31,3 +31,43 @@ D0.md debe tener exactamente estas secciones:
 8. Supuestos, cada uno empezando con la palabra SUPUESTO.
 
 No agregues funcionalidades que no estén en el caso y no generes código.
+
+## Fase 2 · requirements
+Lee D0.md. Genera los requisitos en español con criterios de aceptación en formato EARS:
+"CUANDO <evento> EL SISTEMA DEBERÁ <respuesta>" y "SI <condición> ENTONCES EL SISTEMA DEBERÁ <respuesta>".
+Usa los mismos identificadores de D0.md: RF1, RF2, RF3, RF4 y RNF1…RNFn.
+Cada regla RN1 a RN5 debe aparecer en al menos un criterio y al final incluye una tabla de
+trazabilidad RN → criterio.
+Incluye criterios para estos casos de rechazo: cantidad 0 o negativa, cantidad mayor al stock
+(el stock no cambia), precio negativo, código de producto repetido, producto inexistente y
+fallo a mitad del registro de la venta (se deshace todo).
+No incluyas login, roles, clientes ni boletas.
+
+## Fase 2 · design
+
+Con los requisitos aprobados genera el diseño en español con estas secciones:
+
+1. Arquitectura en capas Model → Repository → Service → Controller → views, más public/index.php
+   como punto de entrada. Para cada capa indica qué hace y qué NO hace: las reglas de negocio
+   solo en Services; los Repositories solo ejecutan SQL con PDO preparado; los Controllers solo
+   leen la petición, validan el token CSRF y llaman al Service; las vistas solo muestran datos
+   escapados.
+2. Base de datos bodega_ventas (utf8mb4, InnoDB):
+   - producto: id INT PK AUTO_INCREMENT, codigo VARCHAR(10) NOT NULL UNIQUE, nombre VARCHAR(100)
+     NOT NULL, categoria VARCHAR(50) NOT NULL, precio DECIMAL(10,2) NOT NULL CHECK (precio >= 0),
+     stock INT NOT NULL CHECK (stock >= 0), stock_minimo INT NOT NULL CHECK (stock_minimo >= 0).
+   - venta: id INT PK AUTO_INCREMENT, producto_id INT NOT NULL FK → producto(id),
+     cantidad INT NOT NULL CHECK (cantidad > 0), precio_unitario DECIMAL(10,2) NOT NULL,
+     total DECIMAL(10,2) NOT NULL, fecha_hora DATETIME NOT NULL.
+3. Contratos de clases con firmas tipadas PHP 8 (declare(strict_types=1)): interfaces
+   ProductoRepositoryInterface y VentaRepositoryInterface (para poder usar repositorios falsos
+   en las pruebas), sus implementaciones PDO, ProductoService y VentaService, con parámetros y
+   retornos tipados (por ejemplo buscarPorId(int $id): ?Producto).
+4. Transacción de venta: beginTransaction, leer el producto con SELECT ... FOR UPDATE, validar
+   las reglas, insertar la venta, descontar el stock, commit; rollBack en el catch.
+5. Manejo de errores: excepciones propias (ValidacionException, StockInsuficienteException,
+   ProductoNoEncontradoException); registro inexistente devuelve null, error de base de datos
+   lanza excepción; al usuario solo se muestran mensajes claros, nunca trazas.
+6. Seguridad: PDO preparado, token CSRF, htmlspecialchars, credenciales leídas desde .env.
+
+No generes código de implementación.
