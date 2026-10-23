@@ -71,3 +71,22 @@ Con los requisitos aprobados genera el diseño en español con estas secciones:
 6. Seguridad: PDO preparado, token CSRF, htmlspecialchars, credenciales leídas desde .env.
 
 No generes código de implementación.
+
+## Fase 3 · Base de datos
+Según design.md genera:
+1. database/schema.sql: DROP DATABASE IF EXISTS bodega_ventas; CREATE DATABASE bodega_ventas
+   CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci; USE bodega_ventas; tablas producto y venta
+   con ENGINE=InnoDB, PRIMARY KEY, FOREIGN KEY de venta.producto_id a producto.id, UNIQUE en codigo
+   y CHECK para precio >= 0, stock >= 0, stock_minimo >= 0 y cantidad > 0. Debe funcionar en la
+   MariaDB de XAMPP.
+2. database/seed.sql con USE bodega_ventas y exactamente estos 8 productos:
+   P001, Arroz superior 5 kg, Abarrotes, 22.50, 20, 5
+   P002, Azúcar rubia 1 kg, Abarrotes, 4.20, 30, 10
+   P003, Aceite vegetal 1 L, Abarrotes, 9.90, 12, 4
+   P004, Leche evaporada 400 g, Lácteos, 4.00, 48, 12
+   P005, Fideo spaghetti 500 g, Abarrotes, 3.50, 25, 8
+   P006, Atún en trozos 170 g, Conservas, 6.50, 3, 6
+   P007, Gaseosa 1.5 L, Bebidas, 7.00, 18, 6
+   P008, Detergente 1 kg, Limpieza, 11.80, 2, 4
+3. .env.example con DB_HOST=localhost, DB_NAME=bodega_ventas, DB_USER=root y DB_PASS vacío.
+Verifica que .gitignore contenga .env. No generes código PHP.

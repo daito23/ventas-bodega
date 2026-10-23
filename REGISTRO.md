@@ -16,3 +16,6 @@ DISEÑO
 
 | 2 · Especificación | design.md, contrato de VentaService | Agregué PDO al constructor de VentaService y corregí la frase "los Service no conocen PDO" | El diseño decía que el Service hace beginTransaction/commit/rollBack, pero sin recibir PDO no podía hacerlo; era una contradicción |
 | 2 · Especificación | design.md, Testing Strategy | Rechacé las pruebas de integración contra base de datos real; dejé solo tests/run.php con repositorios falsos | El examen pide pruebas sin base de datos, sin PHPUnit ni Composer |
+
+FASE 3
+| 3 · Base de datos | database/schema.sql con tablas producto y venta, PK, FK, UNIQUE y CHECK | Agregué CHECK (precio_unitario >= 0) y CHECK (total >= 0) en la tabla venta | Kiro solo validaba la cantidad en venta; un precio o total negativo rompería la RN3 y el total del día |
